@@ -1,0 +1,20 @@
+{
+    "name": "aoc2021js",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "main": "node index.js",
+        "test": "lab -v"
+    },
+    "license": "ISC",
+    "devDependencies": {
+        "@hapi/code": "^8.0.5",
+        "@hapi/lab": "^24.4.0",
+        "@supabase/doctest-js": "^0.1.0",
+        "eslint": "^8.3.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-import": "^2.25.3",
+        "eslint-plugin-prettier": "^4.0.0"
+    }
+}
