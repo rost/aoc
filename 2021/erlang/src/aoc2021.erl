@@ -6,6 +6,7 @@
 %% escript Entry point
 main(Args) ->
     day01:run(readInput("01")),
+    day02:run(readInput("02")),
     erlang:halt(0).
 
 %% Internal functions
