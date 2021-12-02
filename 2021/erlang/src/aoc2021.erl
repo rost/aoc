@@ -3,15 +3,13 @@
 %% API exports
 -export([main/1]).
 
-%%====================================================================
-%% API functions
-%%====================================================================
-
 %% escript Entry point
 main(Args) ->
-    io:format("Args: ~p~n", [Args]),
+    day01:run(readInput("01")),
     erlang:halt(0).
 
-%%====================================================================
 %% Internal functions
-%%====================================================================
+
+readInput(Day) ->
+    {ok, Binary} = file:read_file("../input/input" ++ Day ++ ".txt"),
+    string:tokens(erlang:binary_to_list(Binary), "\n").
