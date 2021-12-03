@@ -2,8 +2,8 @@
 
 const run = (s) => {
     const input = s.split('\n');
-    console.log(`day03 part 1 => ${part1(input)}`);
-    console.log(`day03 part 2 => ${part2(input)}`);
+    console.log(`day03 part 1 => ${part1(input)}`); // 841526
+    console.log(`day03 part 2 => ${part2(input)}`); // 4790390
 };
 
 /**
@@ -13,38 +13,23 @@ const run = (s) => {
 const part1 = (input) => {
     const max = input.length;
     const width = input[0].length;
-
-    const parsed = input.map(line => {
-        const split = line.split('');
-        return split.map(s => parseInt(s));
-    });
+    const lines = input.map(line => line.split('').map(s => parseInt(s)));
 
     const frequencies = Array(width).fill(0);
-
-    parsed.forEach(line => {
+    lines.forEach(line => {
         for (const [index, value] of line.entries()) {
             frequencies[index] = frequencies[index] + value;
         }
-
     });
 
     let gamma = Array(width).fill(0);
-    let epsilon = Array(width).fill(0);
-
     for (const [index, n] of frequencies.entries()) {
-        if (n > (max - n)) {
-            gamma[index] = '1';
-        } else {
-            gamma[index] = '0';
-        }
+        (n > (max - n)) ? gamma[index] = '1' : gamma[index] = '0';
     }
 
+    let epsilon = Array(width).fill(0);
     for (const [index, n] of frequencies.entries()) {
-        if (n > (max - n)) {
-            epsilon[index] = '0';
-        } else {
-            epsilon[index] = '1';
-        }
+        (n > (max - n)) ? epsilon[index] = '0' : epsilon[index] = '1';
     }
 
     let gammaDec = parseInt(gamma.join(''), 2);
@@ -58,66 +43,29 @@ const part1 = (input) => {
  * //=> 230
  */
 const part2 = (input) => {
-    const max = input.length;
-    const width = input[0].length;
-
-
-    const select = (candidates, index) => {
-        const ones = candidates.filter(c => {
-            return c[index] === '1';
-        });
-        const zeros = candidates.filter(c => {
-            return c[index] === '0';
-        });
-
-        if (ones.length > zeros.length) {
-            return ones;
-        } else if (ones.length < zeros.length) {
-            return zeros;
-        } else if (ones.length === zeros.length) {
-            return ones;
-        }
+    const partition = (candidates, index) => {
+        const ones = candidates.filter(c => c[index] === '1');
+        const zeros = candidates.filter(c => c[index] === '0');
+        return [ones, zeros];
     };
 
-    const findMatch = (candidates, index = 0) => {
-        if (candidates.length === 1) {
-            return candidates;
-        }
-
-        const rem = select(candidates, index);
-
-        return findMatch(rem, index + 1);
+    const findMatch = (candidates, selector, index = 0) => {
+        if (candidates.length === 1) return candidates;
+        const [ones, zeros] = partition(candidates, index);
+        const rem = selector(ones, zeros);
+        return findMatch(rem, selector, index + 1);
     };
 
-    const select2 = (candidates, index) => {
-        const ones = candidates.filter(c => {
-            return c[index] === '1';
-        });
-        const zeros = candidates.filter(c => {
-            return c[index] === '0';
-        });
-
-        if (ones.length > zeros.length) {
-            return zeros;
-        } else if (ones.length < zeros.length) {
-            return ones;
-        } else if (ones.length === zeros.length) {
-            return zeros;
-        }
+    const selectorOnes = (ones, zeros) => {
+        return (ones.length >= zeros.length) ? ones : zeros;
     };
 
-    const findMatch2 = (candidates, index = 0) => {
-        if (candidates.length === 1) {
-            return candidates;
-        }
-
-        const rem = select2(candidates, index);
-
-        return findMatch2(rem, index + 1);
+    const selectorZeros = (ones, zeros) => {
+        return (ones.length >= zeros.length) ? zeros : ones;
     };
 
-    const oxyMatch = findMatch(input, 0);
-    const coMatch = findMatch2(input, 0);
+    const oxyMatch = findMatch(input, selectorOnes, 0);
+    const coMatch = findMatch(input, selectorZeros, 0);
 
     let oxyDec = parseInt(oxyMatch, 2);
     let coDec = parseInt(coMatch, 2);
