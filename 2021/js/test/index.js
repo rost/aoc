@@ -14,4 +14,5 @@ const doctestOptions = {
 describe('Solutions', () => {
     doctest('lib/day01.js', doctestOptions);
     doctest('lib/day02.js', doctestOptions);
+    doctest('lib/day03.js', doctestOptions);
 });
