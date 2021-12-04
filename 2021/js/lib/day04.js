@@ -33,125 +33,17 @@ const part1 = (input) => {
     let parts = input.map(line => line.split('\n'));
     const numbers = parts.shift().map(line => line.split(','))[0];
     const boardLines = parts.filter(line => line[0].length !== 0);
-
-    // side effecty, splice mutates the boardLines ref
-    const parseBoards = (boardLines, acc) => {
-        if (boardLines.length === 0) return acc;
-        let board = boardLines.splice(0, 5);
-        board = board.map(b => {
-            const s = b[0];
-            return s.split(' ').filter(c => c !== '');
-        });
-        if (acc.length === 0) {
-            acc[0] = board;
-        } else {
-            acc.push(board);
-        }
-        return parseBoards(boardLines, acc);
-    };
-
     const boards = parseBoards(boardLines, []);
 
-    const matchRow = (numbers, row) => {
-        let diff = new Set(row);
-        const numSet = new Set(numbers);
-        for (let n of numSet) {
-            diff.delete(n);
-        }
-        return Array.from(diff);
-    };
+    const matches = boards.map(b => runBoard(b, numbers));
 
-    const matchCol = (numbers, col) => {
-        let diff = new Set(col);
-        const numSet = new Set(numbers);
-        for (let n of numSet) {
-            diff.delete(n);
-        }
-        return Array.from(diff);
-    };
+    const match = findFirstMatch(matches);
+    const [index, boardDiff] = match;
 
-    const buildCols = (rows) => {
-        const cols = [];
-        const len = rows.length - 1;
-        for (let i = 0; i <= len; i++) {
-            const col = buildCol(rows, i);
-            cols.push(col);
-        }
-        return cols;
-    };
+    const sum = sumResult(boardDiff);
+    const number = numbers[index];
 
-    const buildCol = (rows, index) => {
-        const col = [];
-        rows.forEach(row => {
-            const c = row[index];
-            col.push(c);
-        });
-        return col;
-    };
-
-    const match = (input, board) => {
-        const rows = board;
-        const cols = buildCols(rows);
-
-        const rowResult = rows.map(r => matchRow(input, r));
-        const colResult = cols.map(c => matchCol(input, c));
-
-        const rowHit = rowResult.filter(a => a.length === 0);
-        if (rowHit.length > 0 && rowHit[0].length === 0) {
-            return [true, rowResult];
-        }
-
-        const colHit = colResult.filter(a => a.length === 0);
-        if (colHit.length > 0 && colHit[0].length === 0) {
-            return [true, colResult];
-        }
-        return [false, []];
-    };
-
-    const sumResult = (stuff) => {
-        let count = 0;
-        stuff.forEach(line => {
-            if (line.length > 0) {
-                line.forEach(s => {
-                    const n = parseInt(s);
-                    count = count + n;
-                });
-            }
-        });
-        return count;
-    };
-
-    const run = (numbers, index = 5) => {
-        if (index >= numbers.length) return;
-        const inputLen = index;
-        const input = numbers.slice(0, inputLen);
-
-        const matches = boards.map(b => {
-            return match(input, b);
-        });
-
-        let STOP = false;
-        let result = undefined;
-        matches.forEach(m => {
-            let [maybe, res] = m;
-            if (maybe) {
-                STOP = true;
-                result = res;
-            }
-        });
-
-        if (STOP) {
-            const sum = sumResult(result);
-            const theOtherVal = parseInt(input[index - 1]);
-            const product = sum * theOtherVal;
-            return product;
-        }
-
-        return run(numbers, index + 1);
-    };
-
-    const res = run(numbers);
-    return res;
+    return sum * number;
 };
 
 /**
@@ -181,145 +73,123 @@ const part2 = (input) => {
     let parts = input.map(line => line.split('\n'));
     const numbers = parts.shift().map(line => line.split(','))[0];
     const boardLines = parts.filter(line => line[0].length !== 0);
-
-    // side effecty, splice mutates the boardLines ref
-    const parseBoards = (boardLines, acc) => {
-        if (boardLines.length === 0) return acc;
-        let board = boardLines.splice(0, 5);
-        board = board.map(b => {
-            const s = b[0];
-            return s.split(' ').filter(c => c !== '');
-        });
-        if (acc.length === 0) {
-            acc[0] = board;
-        } else {
-            acc.push(board);
-        }
-        return parseBoards(boardLines, acc);
-    };
-
     const boards = parseBoards(boardLines, []);
 
-    const matchRow = (numbers, row) => {
-        let diff = new Set(row);
-        const numSet = new Set(numbers);
-        for (let n of numSet) {
-            diff.delete(n);
-        }
-        return Array.from(diff);
-    };
+    const matches = boards.map(b => runBoard(b, numbers));
 
-    const matchCol = (numbers, col) => {
-        let diff = new Set(col);
-        const numSet = new Set(numbers);
-        for (let n of numSet) {
-            diff.delete(n);
-        }
-        return Array.from(diff);
-    };
+    const match = findLastMatch(matches);
+    const [index, boardDiff] = match;
 
-    const buildCols = (rows) => {
-        const cols = [];
-        const len = rows.length - 1;
-        for (let i = 0; i <= len; i++) {
-            const col = buildCol(rows, i);
-            cols.push(col);
-        }
-        return cols;
-    };
+    const sum = sumResult(boardDiff);
+    const number = numbers[index];
 
-    const buildCol = (rows, index) => {
-        const col = [];
-        rows.forEach(row => {
-            const c = row[index];
-            col.push(c);
-        });
-        return col;
-    };
+    return sum * number;
+};
 
-    const match = (input, board) => {
-        const rows = board;
-        const cols = buildCols(rows);
+// side effecty, splice mutates the boardLines ref
+const parseBoards = (boardLines, acc) => {
+    if (boardLines.length === 0) return acc;
+    let board = boardLines.splice(0, 5);
+    board = board.map(b => {
+        const s = b[0];
+        return s.split(' ').filter(c => c !== '');
+    });
+    if (acc.length === 0) {
+        acc[0] = board;
+    } else {
+        acc.push(board);
+    }
+    return parseBoards(boardLines, acc);
+};
 
-        const rowResult = rows.map(r => matchRow(input, r));
-        const colResult = cols.map(c => matchCol(input, c));
+const buildCols = (rows) => {
+    const cols = [];
+    const len = rows.length - 1;
+    for (let i = 0; i <= len; i++) {
+        const col = buildCol(rows, i);
+        cols.push(col);
+    }
+    return cols;
+};
 
-        const rowHit = rowResult.filter(a => a.length === 0);
-        if (rowHit.length > 0 && rowHit[0].length === 0) {
-            return [true, rowResult];
-        }
+const buildCol = (rows, index) => {
+    return rows.reduce((acc, row) => [...acc, row[index]], []);
+};
 
-        const colHit = colResult.filter(a => a.length === 0);
-        if (colHit.length > 0 && colHit[0].length === 0) {
-            return [true, colResult];
-        }
-        return [false, []];
-    };
+const matchLine = (numbers, row) => {
+    let diff = new Set(row);
+    const numSet = new Set(numbers);
+    for (let n of numSet) {
+        diff.delete(n);
+    }
+    return Array.from(diff);
+};
 
-    const sumResult = (stuff) => {
-        let count = 0;
-        stuff.forEach(line => {
-            if (line.length > 0) {
-                line.forEach(s => {
-                    const n = parseInt(s);
-                    count = count + n;
-                });
-            }
-        });
-        return count;
-    };
+const matchBoard = (input, board) => {
+    const rows = board;
+    const cols = buildCols(rows);
+    const rowResult = rows.map(r => matchLine(input, r));
+    const colResult = cols.map(c => matchLine(input, c));
+    const rowHit = rowResult.filter(a => a.length === 0);
+    if (rowHit.length > 0 && rowHit[0].length === 0) {
+        return [true, rowResult];
+    }
+    const colHit = colResult.filter(a => a.length === 0);
+    if (colHit.length > 0 && colHit[0].length === 0) {
+        return [true, colResult];
+    }
+    return [false, []];
+};
 
-    const runBoard = (board, numbers, index = 5) => {
-        if (index >= numbers.length) return;
-        const inputLen = index;
-        const input = numbers.slice(0, inputLen);
-
-        const matches = match(input, board);
-
-        let STOP = false;
-        let result = undefined;
-
-        let [maybe, res] = matches;
-        if (maybe) {
-            STOP = true;
-            result = res;
-        }
-
-        if (STOP) {
-            return [index, result];
-        }
-
+const runBoard = (board, numbers, index = 4) => {
+    if (index >= numbers.length) return;
+    const inputLen = index + 1;
+    const input = numbers.slice(0, inputLen);
+    const [maybe, b] = matchBoard(input, board);
+    if (maybe) {
+        return [index, b];
+    } else {
         return runBoard(board, numbers, index + 1);
-    };
+    }
+};
 
-    const findLastMatch = (matches) => {
-        let hit = 0;
-        let cand = [];
-        matches.forEach(m => {
-            const n = m[0];
-            if (n > hit) {
-                hit = n;
-            }
-        });
-        matches.forEach(m => {
-            if (m[0] === hit) {
-                cand = m;
-            }
-        });
-        return cand;
-    };
+const findFirstMatch = (matches) => {
+    let index;
+    let cand;
+    matches.forEach(match => {
+        let [i, boardDiff] = match;
+        if (!index || i < index) {
+            index = i;
+            cand = boardDiff;
+        }
+    });
+    return [index, cand];
+};
 
-    const run = (numbers) => {
-        const res = boards.map(b => runBoard(b, numbers));
-        const lastMatch = findLastMatch(res);
-        const sum = sumResult(lastMatch[1]);
-        const theOtherVal = numbers[lastMatch[0] - 1];
-        const product = sum * theOtherVal;
-        return product;
-    };
+const findLastMatch = (matches) => {
+    let index;
+    let cand;
+    matches.forEach(match => {
+        const [i, boardDiff] = match;
+        if (!index || i > index) {
+            index = i;
+            cand = boardDiff;
+        }
+    });
+    return [index, cand];
+};
 
-    const res = run(numbers);
-    return res;
+const sumResult = (boardDiff) => {
+    let count = 0;
+    boardDiff.forEach(line => {
+        if (line.length > 0) {
+            line.forEach(s => {
+                const n = parseInt(s);
+                count = count + n;
+            });
+        }
+    });
+    return count;
 };
 
 module.exports = {
