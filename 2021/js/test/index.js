@@ -16,4 +16,5 @@ describe('Solutions', () => {
     doctest('lib/day02.js', doctestOptions);
     doctest('lib/day03.js', doctestOptions);
     doctest('lib/day04.js', doctestOptions);
+    doctest('lib/day05.js', doctestOptions);
 });
