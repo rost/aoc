@@ -1,21 +1,31 @@
 'use strict';
 
 const run = (s) => {
-    const input = s.split('\n');
+    const input = s.trim().split('\n');
     console.log(`day05 part 1 => ${part1(input)}`); // 5373
     console.log(`day05 part 2 => ${part2(input)}`); // 21514
 };
 
 /**
- * @example part1([ 0,9 -> 5,9 8,0 -> 0,8 9,4 -> 3,4 2,2 -> 2,1 7,0 -> 7,4 6,4 -> 2,0 0,9 -> 2,9 3,4 -> 1,4 0,0 -> 8,8 5,5 -> 8,2 ])
+ * @example part1([ 0,9 -> 5,9
+ * 8,0 -> 0,8
+ * 9,4 -> 3,4
+ * 2,2 -> 2,1
+ * 7,0 -> 7,4
+ * 6,4 -> 2,0
+ * 0,9 -> 2,9
+ * 3,4 -> 1,4
+ * 0,0 -> 8,8
+ * 5,5 -> 8,2
+ * ])
  * //=> 5
  */
 const part1 = (input) => {
-    const parsed = input.map(line => parse(line)).filter(p => p !== undefined);
-    const [x, y] = maxes(parsed);
-    const grid = multiArray(x, y);
+    const pairs = input.map(line => parsePairs(line));
+    const [x, y] = maxes(pairs);
+    const grid = matrix(x, y);
 
-    const lines = parsed.map(pair => calculateLines(pair));
+    const lines = pairs.map(pair => calculateLines(pair));
 
     const populated = populate(lines, grid);
     const count = countOverlaps(populated);
@@ -24,16 +34,27 @@ const part1 = (input) => {
 };
 
 /**
- * @example part2([ 0,9 -> 5,9 8,0 -> 0,8 9,4 -> 3,4 2,2 -> 2,1 7,0 -> 7,4 6,4 -> 2,0 0,9 -> 2,9 3,4 -> 1,4 0,0 -> 8,8 5,5 -> 8,2 ])
- * //=> 5
+ * @example part2([ 0,9 -> 5,9
+ * 8,0 -> 0,8
+ * 9,4 -> 3,4
+ * 2,2 -> 2,1
+ * 7,0 -> 7,4
+ * 6,4 -> 2,0
+ * 0,9 -> 2,9
+ * 3,4 -> 1,4
+ * 0,0 -> 8,8
+ * 5,5 -> 8,2
+ * ])
+ * //=> 12
  */
 const part2 = (input) => {
-    const parsed = input.map(line => parse(line)).filter(p => p !== undefined);
-    const [x, y] = maxes(parsed);
-    const grid = multiArray(x, y);
+    const pairs = input.map(line => parsePairs(line));
+    // .filter(p => p !== undefined);
+    const [x, y] = maxes(pairs);
+    const grid = matrix(x, y);
 
-    const lines = parsed.map(pair => calculateLines(pair));
-    const diagonalLines = parsed.map(pair => calculateDiagonalLines(pair));
+    const lines = pairs.map(pair => calculateLines(pair));
+    const diagonalLines = pairs.map(pair => calculateDiagonalLines(pair));
 
     let populated = populate(lines, grid);
     populated = populate(diagonalLines, populated);
@@ -42,36 +63,29 @@ const part2 = (input) => {
     return count;
 };
 
-const parse = (line) => {
-    const pairs = line.split(' -> ').filter(p => p.length !== 0);
-    if (pairs.length > 0) {
-        let pair1 = pairs[0].split(',');
-        pair1 = [parseInt(pair1[0]), parseInt(pair1[1])];
-        let pair2 = pairs[1].split(',');
-        pair2 = [parseInt(pair2[0]), parseInt(pair2[1])];
-        return [pair1, pair2];
-    } else {
-        return;
-    }
+const parsePairs = (line) => {
+    const [pair0, pair1] = line.split(' -> ');
+    let [x1, y1] = pair0.split(',');
+    let [x2, y2] = pair1.split(',');
+    return [
+        [parseInt(x1), parseInt(y1)],
+        [parseInt(x2), parseInt(y2)]
+    ];
 };
 
-const maxes = (parsed) => {
-    let x = 0;
-    let y = 0;
-    parsed.forEach(ps => {
-        let x1 = ps[0][0];
-        let y1 = ps[0][1];
-        let x2 = ps[1][0];
-        let y2 = ps[1][1];
+const maxes = (pairs) => {
+    let [x, y] = pairs.reduce(([x, y], pair) => {
+        let [[x1, y1], [x2, y2]] = pair;
         x = x1 > x ? x1 : x;
-        y = y1 > x ? y1 : y;
+        y = y1 > y ? y1 : y;
         x = x2 > x ? x2 : x;
-        y = y2 > x ? y2 : y;
-    });
+        y = y2 > y ? y2 : y;
+        return [x, y];
+    }, [0, 0]);
     return [x, y];
 };
 
-const multiArray = (x, y) => {
+const matrix = (x, y) => {
     let arr = [];
     for (let i = 0; i <= x; i++) {
         let yArr = Array(y + 1).fill(0);
@@ -81,12 +95,8 @@ const multiArray = (x, y) => {
 };
 
 const calculateLines = (pair) => {
-    let [p0, p1] = pair;
     let line = [];
-    let x1 = p0[0];
-    let y1 = p0[1];
-    let x2 = p1[0];
-    let y2 = p1[1];
+    let [[x1, y1], [x2, y2]] = pair;
     if (x1 === x2) {
         if (y1 < y2) {
             for (let i = y1; i <= y2; i++) {
@@ -96,10 +106,6 @@ const calculateLines = (pair) => {
             for (let i = y2; i <= y1; i++) {
                 line.push([x1, i]);
             }
-        }
-        else {
-            line.push(p0);
-            line.push(p1);
         }
     } else if (y1 === y2) {
         if (x1 < x2) {
@@ -111,45 +117,34 @@ const calculateLines = (pair) => {
                 line.push([i, y1]);
             }
         }
-        else {
-            line.push(p0);
-            line.push(p1);
-        }
     }
     return line;
 };
 
 const calculateDiagonalLines = (pair) => {
-    let [p0, p1] = pair;
     let line = [];
-    let x1 = p0[0];
-    let y1 = p0[1];
-    let x2 = p1[0];
-    let y2 = p1[1];
-    if (x1 < x2 && y1 < y2) {
-        let y = y1;
-        for (let x = x1; x <= x2; x++) {
+    let [[x1, y1], [x2, y2]] = pair;
+    if ((x1 < x2 && y1 < y2) || (x1 > x2 && y1 > y2)) {
+        let xmax = (x1 < x2) ? x2 : x1;
+        let x = (x1 < x2) ? x1 : x2;
+        let y = (y1 < y2) ? y1 : y2;
+        for (x; x <= xmax; x++) {
             line.push([x, y]);
             y++;
         }
     }
-    if (x1 > x2 && y1 > y2) {
-        let y = y1;
-        for (let x = x1; x >= x2; x--) {
-            line.push([x, y]);
-            y--;
-        }
-    }
     if (x1 < x2 && y1 > y2) {
         let y = y1;
-        for (let x = x1; x <= x2; x++) {
+        let x = x1;
+        for (x; x <= x2; x++) {
             line.push([x, y]);
             y--;
         }
     }
     if (x1 > x2 && y1 < y2) {
         let y = y1;
-        for (let x = x1; x >= x2; x--) {
+        let x = x1;
+        for (x; x >= x2; x--) {
             line.push([x, y]);
             y++;
         }
@@ -161,24 +156,19 @@ const populate = (lines, grid) => {
     const populated = grid;
     lines.forEach(line => {
         line.forEach(pair => {
-            let x = pair[0];
-            let y = pair[1];
-            let current = grid[x][y];
-            grid[x][y] = current + 1;
+            let [x, y] = pair;
+            grid[x][y] = grid[x][y] + 1;
         });
     });
     return populated;
 };
 
 const countOverlaps = (grid) => {
-    let count = 0;
-    grid.forEach(line => {
-        for (let i = 0; i <= line.length; i++) {
-            if (line[i] > 1) {
-                count = count + 1;
-            }
-        }
-    });
+    const count = grid.reduce((count, line) => {
+        return count + line.reduce((count, n) => {
+            return n > 1 ? count + 1 : count;
+        }, 0);
+    }, 0);
     return count;
 };
 
