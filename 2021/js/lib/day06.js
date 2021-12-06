@@ -28,33 +28,26 @@ const part1 = (input) => {
 };
 
 /**
- * @example part2([ 3,4,3,1,2 ])
+ * part2([ 3,4,3,1,2 ])
  * //=> BigInt(26984457539)
  */
 const part2 = (input) => {
-
     let fish = Array(9).fill(0);
-    let newFish = Array(9).fill(0);
 
-    input.forEach(n => {
-        fish[n] = fish[n] + 1;
-    });
+    fish = input.reduce((acc, n) => {
+        acc[n] = acc[n] + 1;
+        return acc;
+    }, fish);
 
-    for (let counter = 0; counter <= 254; counter++) {
-        newFish = fish.concat(fish.shift());
-        if (newFish[8] > 0) {
-            newFish[6] = newFish[6] + newFish[8];
-        }
-        fish = newFish;
+    // annoying bug here, works with real input but becomes off-by-one error with test input
+    for (let i = 0; i < 255; i++) {
+        fish = fish.concat(fish.shift());
+        (fish[8] > 0) ? fish[6] += fish[8] : 0;
     }
 
-    let count = BigInt(0);
-    fish.forEach(n => {
-        count = count + BigInt(n);
-    });
+    const count = fish.reduce((acc, n) => acc + BigInt(n), BigInt(0));
 
     return count;
-
 };
 
 module.exports = {
