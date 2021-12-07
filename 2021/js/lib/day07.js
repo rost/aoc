@@ -1,5 +1,7 @@
 'use strict';
 
+const { sum: usum, range: urange } = require('./utils.js');
+
 const run = (s) => {
     const input = s.split(',').map(s => Number(s));
     console.log(`day07 part 1 => ${part1(input)}`); // 352331
@@ -11,8 +13,8 @@ const run = (s) => {
  * //=> 37
  */
 const part1 = (input) => {
-    const max = input.reduce((acc, n) => n > acc ? n : acc, 0);
-    const min = input.reduce((acc, n) => n < acc ? n : acc, 0);
+    const max = Math.max(...input);
+    const min = Math.min(...input);
 
     let sums = [];
 
@@ -25,8 +27,7 @@ const part1 = (input) => {
         sums.push(sum);
     }
 
-    const maxSum = sums.reduce((acc, n) => n > acc ? n : acc, 0);
-    const minSum = sums.reduce((acc, n) => n < acc ? n : acc, maxSum);
+    const minSum = Math.min(...sums);
 
     return minSum;
 };
@@ -36,28 +37,22 @@ const part1 = (input) => {
  * //=> 168
  */
 const part2 = (input) => {
-    const max = input.reduce((acc, n) => n > acc ? n : acc, 0);
-    const min = input.reduce((acc, n) => n < acc ? n : acc, 0);
+    const max = Math.max(...input);
+    const min = Math.min(...input);
 
-    let sums = [];
-
-    for (let i = min; i < max; i++) {
-        let innerSums = [];
-        let sum = 0;
-        input.forEach(n => {
+    const sums = urange(min, max).reduce((acc, i) => {
+        const innerSums = input.reduce((acc, n) => {
             const dist = Math.abs(i - n);
-            // this ooms the machine :D
-            // const r = range(0, dist);
-            // const innerSum = r.reduce((acc, n) => acc + n, 0);
             const innerSum = (dist * (dist + 1)) / 2;
-            innerSums.push(innerSum);
-        });
-        sum = innerSums.reduce((acc, n) => acc + n, 0);
-        sums.push(sum);
-    }
+            return [...acc, innerSum];
+        }, []);
 
-    const maxSum = sums.reduce((acc, n) => n > acc ? n : acc, 0);
-    const minSum = sums.reduce((acc, n) => n < acc ? n : acc, maxSum);
+        const sum = usum(innerSums);
+
+        return [...acc, sum];
+    }, []);
+
+    const minSum = Math.min(...sums);
 
     return minSum;
 };
