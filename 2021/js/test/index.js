@@ -19,4 +19,5 @@ describe('Solutions', () => {
     // doctest('lib/day05.js', doctestOptions);
     doctest('lib/day06.js', doctestOptions);
     doctest('lib/day07.js', doctestOptions);
+    doctest('lib/day08.js', doctestOptions);
 });
