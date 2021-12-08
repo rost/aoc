@@ -4,9 +4,10 @@
 -export([main/1]).
 
 %% escript Entry point
-main(Args) ->
+main(_) ->
     day01:run(readInput("01")),
     day02:run(readInput("02")),
+    day08:run(readInput("08")),
     erlang:halt(0).
 
 %% Internal functions
