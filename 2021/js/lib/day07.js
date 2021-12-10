@@ -44,7 +44,8 @@ const part2 = (input) => {
         const innerSums = input.reduce((acc, n) => {
             const dist = Math.abs(i - n);
             const innerSum = (dist * (dist + 1)) / 2;
-            return [...acc, innerSum];
+            if (typeof (acc) === 'object') acc.push(innerSum);
+            return acc;
         }, []);
 
         const sum = usum(innerSums);
