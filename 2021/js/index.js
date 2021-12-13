@@ -17,3 +17,4 @@ require('./lib/day08').run(readInput('08'));
 require('./lib/day09').run(readInput('09'));
 require('./lib/day10').run(readInput('10'));
 require('./lib/day12').run(readInput('12'));
+require('./lib/day13').run(readInput('13'));
