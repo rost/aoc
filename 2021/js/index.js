@@ -19,3 +19,4 @@ require('./lib/day10').run(readInput('10'));
 require('./lib/day12').run(readInput('12'));
 require('./lib/day13').run(readInput('13'));
 require('./lib/day14').run(readInput('14'));
+require('./lib/day16').run(readInput('16'));
