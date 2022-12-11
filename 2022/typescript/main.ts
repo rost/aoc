@@ -9,6 +9,7 @@ import day07 from "@/day07.ts";
 import day08 from "@/day08.ts";
 import day09 from "@/day09.ts";
 import day10 from "@/day10.ts";
+import day11 from "@/day11.ts";
 
 const input = (day: string): Promise<string> => Deno.readTextFile(`./../input/input${day}.txt`);
 
@@ -22,3 +23,4 @@ day07.run(await input("07"));
 day08.run(await input("08"));
 day09.run(await input("09"));
 day10.run(await input("10"));
+day11.run(await input("11"));
