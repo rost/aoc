@@ -6,4 +6,5 @@ let readInput num =
 [<EntryPoint>]
 let main _args =
     Day01.run (readInput "01")
+    Day02.run (readInput "02")
     0
