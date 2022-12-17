@@ -7,4 +7,5 @@ let readInput num =
 let main _args =
     Day01.run (readInput "01")
     Day02.run (readInput "02")
+    Day03.run (readInput "03")
     0
