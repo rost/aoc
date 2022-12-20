@@ -1,3 +1,5 @@
+import { sumOf } from "std/collections/mod.ts";
+
 function run(input: string): void {
     const res1 = part1(input);
     console.log('Day 02, part 1:', res1);
@@ -9,7 +11,7 @@ function part1(input: string): number {
     const lines = input.split('\n');
     const rounds = lines.map((line) => line.split(' '));
     const scores = rounds.map((round) => score(round));
-    const sumB = scores.reduce((acc, score) => acc + score[1], 0);
+    const sumB = sumOf(scores, (score) => score[1])
     return sumB;
 }
 
@@ -47,7 +49,8 @@ function part2(input: string): number {
     const rounds = lines.map((line) => line.split(' '));
     const newRounds = rounds.map((round) => strategy_guide(round));
     const scores = newRounds.map((round) => score(round));
-    const sumB = scores.reduce((acc, score) => acc + score[1], 0);
+    // const sumB = scores.reduce((acc, score) => acc + score[1], 0);
+    const sumB = sumOf(scores, (score) => score[1])
     return sumB;
 }
 

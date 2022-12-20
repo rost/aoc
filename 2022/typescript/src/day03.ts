@@ -1,3 +1,4 @@
+import { chunk, intersect, sumOf } from "std/collections/mod.ts";
 
 function run(input: string): void {
     const res1 = part1(input);
@@ -16,87 +17,43 @@ function part1(input: string): number {
         return [f, s];
     });
 
-    const freqSets = splitLines.map(([f, s]) => [freqSet(f), freqSet(s)]);
-
-    const overlaps = freqSets.map(([f, s]) => {
-        const overlap = new Set<string>();
-        for (const char of f) {
-            if (s.has(char)) {
-                overlap.add(char);
-            }
-        }
+    const overlaps = splitLines.map(([f, s]) => {
+        const overlap = intersect(Array.from(f), Array.from(s));
         return overlap;
     });
 
     const priorities = overlaps.map(overlap => {
-        let sum = 0;
-        for (const char of overlap) {
-            sum += priority(char);
-        }
-        return sum;
+        return sumOf(overlap, priority)
     });
 
-    const sum = priorities.reduce((acc, p) => acc + p, 0);
+    const sum = sumOf(priorities, Number);
 
     return sum;
 }
 
 function priority(char: string): number {
     const code = char.charCodeAt(0);
-    if (code >= 97) {
-        return code - 96;
-    } else {
-        return code - 38;
-    }
-}
-
-function freqSet(str: string): Set<string> {
-    const set = new Set<string>();
-    for (const char of str) {
-        set.add(char);
-    }
-    return set;
+    return (code >= 97) ? code - 96 : code - 38;
 }
 
 function part2(input: string): number {
     const lines = input.split('\n');
-    const groups = elfGroups(lines);
+    // const groups = elfGroups(lines);
+    const groups = chunk(lines, 3);
 
-    const freqSets = groups.map(group => {
-        const freqSets = group.map(freqSet);
-        return freqSets;
-    });
-
-    const overlaps = freqSets.map(([f, s, t]) => {
-        const overlap = new Set<string>();
-        for (const char of f) {
-            if (s.has(char) && t.has(char)) {
-                overlap.add(char);
-            }
-        }
+    const overlaps = groups.map((strings) => {
+        const as = strings.map(s => s ? Array.from(s) : []);
+        const overlap = intersect(...as);
         return overlap;
     });
 
     const priorities = overlaps.map(overlap => {
-        let sum = 0;
-        for (const char of overlap) {
-            sum += priority(char);
-        }
-        return sum;
+        return sumOf(Array.from(overlap), priority)
     });
 
-    const sum = priorities.reduce((acc, p) => acc + p, 0);
+    const sum = sumOf(priorities, Number);
 
     return sum;
 }
 
-function elfGroups(lines: string[]): string[][] {
-    const groups = [];
-    const chunkSize = 3;
-    for (let i = 0; i < lines.length; i += chunkSize) {
-        const chunk = lines.slice(i, i + chunkSize);
-        groups.push(chunk);
-    }
-    return groups;
-}
 export default { run, part1, part2 };
